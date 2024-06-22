@@ -107,12 +107,18 @@ Lorsqu'une série de valeurs aberrantes est rejetée par le filtre, ces rejets s
 <img src="assets/explication_puits.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto; width: 600px">
 
 **Application du filtre "rayon d'exclusivité" avec un rayon de 1.5 m.**
+
 <img src="assets/rayon_exclusivite_1.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 **Réduction du rayon à 1m, on observe l’apparition d’un puit ce qui empêche la progression de l’algorithme.**
+
 <img src="assets/rayon_exclusivite_2.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### La prédiction pour régler le problème
+
+Si $P_t$ est la position à l'instant t et $P_{t-1}$ est la position à l'instant précédent, alors la position prédictive $P_{t+1}$ vaut :
+
+$$P_{t+1} = P_t + \alpha (P_t-P_{t-1})$$
 
 ### Le problème de l'excès de prédiction
 
@@ -121,6 +127,21 @@ Lorsqu'une série de valeurs aberrantes est rejetée par le filtre, ces rejets s
 <img src="assets/correction_prediction.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### Lissage des données avec EMA
+
+Maintenant, attaquons-nous au problème du bruit constant.
+
+L'EMA est une méthode de lissage qui applique un poids exponentiellement décroissant aux valeurs passées. Contrairement à une moyenne simple, l'EMA réagit plus rapidement aux changements récents tout en amortissant les variations brusques.
+
+Soit une série de valeurs $P$, $\alpha\in[0;1]$ un coefficient de lissage, et $P_t$ la position actuelle, $Ema_t$ la position lissée alors :
+
+$$ Ema_t = \alpha P_t + (1-\alpha) Ema_{t-1}$$
+
+Un coefficient $\alpha$ élevé (proche de 1) donne plus de poids aux valeurs récentes, permettant à l'EMA de suivre plus étroitement les nouvelles données. Cela est utile pour des mouvements rapides où les changements de position sont fréquents.
+
+Un coefficient $\alpha$ bas (proche de 0) lisse davantage les données, en mettant plus l'accent sur les valeurs passées. Cela est idéal pour atténuer les bruits et les fluctuations mineures.
+
+Dans les différents tests que nous avons réalisé, il est acceptable de diminuer jusqu'à $\alpha$=0.33.
+
 
 ### Algorithme de filtrage final
 <img src="assets/algorithme_final.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
@@ -150,6 +171,10 @@ Les données simulées sont ensuite visualisées en temps réel dans la console 
 
 ## Ce qu'il faut retenir
 
+Dorénavant, tous les animations qui vont suivre sont issus des tests dans des conditions réels.
+
+Tous les rendus des animations sont regroupés <a href="\data\gif\18-05-2024\">ici</a>
+
 ### Toutes les valeurs aberrantes ont été exclues
 
 L'algorithme de filtrage basé sur le rayon d'exclusivité a démontré une grande efficacité dans l'élimination des valeurs aberrantes. Les positions situées en dehors du rayon défini par rapport à la dernière position valide ont été rejetées, réduisant donc les sauts brusques.
@@ -161,7 +186,11 @@ L'algorithme de filtrage basé sur le rayon d'exclusivité a démontré une gran
 
 L'utilisation de l'algorithme EMA a amélioré la fluidité des trajectoires. En appliquant un coefficient de lissage adapté, l'EMA a atténué les fluctuations mineures, qui fournit maintenant des trajectoires plus stables et réalistes. Il faut donc éviter d'activer le smoother d'origine pour éviter de rajouter de la latence inutilement.
 
+<img src="assets/conclusion_lissage.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 ### Notre algorithme ne prédit pas lorsque l'on perd la connexion
+
+<img src="assets/conclusion_prediction.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### Nous constatons une lègere latence 
 
