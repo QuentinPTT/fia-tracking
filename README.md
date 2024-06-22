@@ -10,17 +10,31 @@
 ## Sommaire
 
 - [Introduction](#installation)
-    - [Contexte](#composer)
-    - [Problématique](#ddev)
-    - [Objectifs](#ddev)
-- [Méthodologie](#typo3-setup)
-    - [Acquisition des données](#database-setup)
-    - [Traitement des données](#security)
-    - [Mise en place de l'algorithme](#security)
-- [Développement sur Max8](#page-setup)
-    - [Download the Aimeos Page Tree t3d file](#download-the-aimeos-page-tree-t3d-file)
-    - [Go to the Import View](#go-to-the-import-view)
+    - [Contexte](#contexte)
+    - [Problématique](#problématique)
+    - [Objectifs](#objectifs)
+- [Acquisition des données](#acquisition-des-données)
+- [Traitement des données](#traitement-des-données)
+    - [Transformation des données](#transformation-des-données)
+    - [Animation des données brutes](#animation-des-données-brutes)
+    - [Mise en place d'un filtre sur base d'un rayon d'exclusivité](#mise-en-place-dun-filtre-sur-base-dun-rayon-dexclusivité)
+- [Mise en place de l'algorithme](#security)
+    - [Problème du puits](#problème-du-puits)
+    - [La prédiction pour régler le problème](#la-prédiction-pour-régler-le-problème)
+    - [Le problème de l'excès de prédiction](#le-problème-de-lexcès-de-prédiction)
+    - [La correction de la prediction](#la-correction-de-la-prediction)
+    - [Lissage des données avec EMA](#lissage-des-données-avec-ema)
+    - [Algorithme de filtrage final](#algorithme-de-filtrage-final)
+- [Développement sur Max8](#développement-sur-maxmsp)
+    - [Simulation de l'envoie de donnée](#simulation-de-lenvoie-de-donnée)
+    - [Choix de la solution](#choix-de-la-solution)
+    - [Implémentation dans Max8](#implémentation-dans-max8)
+    - [Analyse des résultats](#analyse-des-résultats)
 - [Ce qu'il faut retenir](#page-setup)
+    - [Toutes les valeurs aberrantes ont été exclues](#toutes-les-valeurs-aberrantes-ont-été-exclues)
+    - [L'algorithme EMA permet un lissage complet du parcours](#lalgorithme-ema-permet-un-lissage-complet-du-parcours)
+    - [Nous constatons une lègere latence](#nous-constatons-une-lègere-latence)
+    - [L'Histoire des Timestamps](#lhistoire-des-timestamps)
 - [Remerciements](#links)
 
 ## Introduction
@@ -41,7 +55,11 @@ Le suivi en temps réel des comédiens est compromis par les limitations techniq
 
 * **Saut de position** : Le système Localino souffre de sauts de position imprévus, où la position détectée d'un comédien peut soudainement changer drastiquement sans raison apparente. 
 
+<img src="assets/bruit_saut.png" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 * **Bruit de mesure** : Le bruit constant généré par l'imprécision du matériel entraine des petites erreurs fréquentes.
+
+<img src="assets/bruit_constant.png" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 ### Objectifs
 Les **objectifs de ce projet** sont de :
@@ -58,6 +76,8 @@ Pour la collecte des données, quatre ancres Localino ont été installées aux 
 
 Les données collectées comprennent des informations sur la position du comédien à différents moments, capturées sous divers scénarios et conditions (vitesse de déplacement variable, etc.). Ces mesures initiales sont fondamentales pour analyser la performance du système Localino et identifier les sources d'erreurs et de bruit dans les données de position.
 
+<img src="assets/points_sur_scène.png" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 ## Traitement des données
 
 ### Transformation des données
@@ -67,6 +87,8 @@ Une fois les données brutes collectées par le système Localino, nous les avon
 Les données brutes capturées par le tag, comprenant les coordonnées de position X,Y et Z ainsi que les timestamps correspondants, ont été exportées depuis Max8 en TXT, converties d'abord en fichier CSV, puis en panda dataframe pour faciliter la manipulation des données.
 
 ### Animation des données brutes
+
+<img src="assets/animation_brut.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
 
 Pour mieux comprendre les comportements des données brutes et identifier les sources d'erreurs, des animations ont été réalisées. Ces animations, crées à partir des fichiers CSV, ont permis de visualiser les trajectoires du comédien en temps réel. Nous avons pu ainsi repérer les sauts de position, les bruits constants et les autres anomalies.
 
@@ -78,15 +100,31 @@ Le principe du filtre de rayon d'exclusivité repose sur la détermination d'une
 
 ### Problème du puits
 
+Sauf qu'un nouveau problème survient, celui que l'on nommera du "puits".
+
+Lorsqu'une série de valeurs aberrantes est rejetée par le filtre, ces rejets successifs peuvent entraîner une situation où les nouvelles positions, bien que valides, se situent également en dehors du rayon d'exclusivité par rapport à la dernière position acceptée.
+
+<img src="assets/explication_puits.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto; width: 600px">
+
+**Application du filtre "rayon d'exclusivité" avec un rayon de 1.5 m.**
+<img src="assets/rayon_exclusivite_1.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
+**Réduction du rayon à 1m, on observe l’apparition d’un puit ce qui empêche la progression de l’algorithme.**
+<img src="assets/rayon_exclusivite_2.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 ### La prédiction pour régler le problème
 
 ### Le problème de l'excès de prédiction
 
 ### La correction de la prediction
 
+<img src="assets/correction_prediction.gif" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 ### Lissage des données avec EMA
 
 ### Algorithme de filtrage final
+<img src="assets/algorithme_final.jpeg" alt="Schéma du système Localino" style="display: block; margin-left: auto; margin-right: auto;">
+
 
 ## Développement sur MaxMSP
 
@@ -133,3 +171,14 @@ Une légère latence de 400ms (sans coupures) a été observée dans le suivi de
 
 Lors des tests, il a été observé que les timestamps des positions capturées étaient décalés, ce qui signifie que les positions enregistrées n'étaient pas alignées avec les moments réels des mouvements des comédiens.
 
+## Remerciements
+
+Nous tenons à remercier Monsieur STRICHER et Monsieur FONTANA de nous avoir accompagné tout au long de ce projet !
+
+<div style="display:flex; gap:2em; justify-content:center;">
+    <a>Quentin PETIT</a>
+    <p>●</p>
+    <a>Antonin CLERICE</a>
+    <p>●</p>
+    <a>Alexeï YADRIN</a>
+</div>
