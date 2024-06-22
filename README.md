@@ -30,7 +30,7 @@
     - [Choix de la solution](#choix-de-la-solution)
     - [Implémentation dans Max8](#implémentation-dans-max8)
     - [Analyse des résultats](#analyse-des-résultats)
-- [Ce qu'il faut retenir](#page-setup)
+- [Ce qu'il faut retenir](#ce-quil-faut-retenir)
     - [Toutes les valeurs aberrantes ont été exclues](#toutes-les-valeurs-aberrantes-ont-été-exclues)
     - [L'algorithme EMA permet un lissage complet du parcours](#lalgorithme-ema-permet-un-lissage-complet-du-parcours)
     - [Nous constatons une lègere latence](#nous-constatons-une-lègere-latence)
@@ -171,7 +171,7 @@ Les données simulées sont ensuite visualisées en temps réel dans la console 
 
 ## Ce qu'il faut retenir
 
-Dorénavant, tous les animations qui vont suivre sont issus des tests dans des conditions réels.
+Dorénavant, toutes les animations qui vont suivre sont issus des tests dans des conditions réelles.
 
 Tous les rendus des animations sont regroupés <a href="\data\gif\18-05-2024\">ici</a>
 
