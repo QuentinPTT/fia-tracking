@@ -214,7 +214,7 @@ Nous avons créer un nouveau notebook.
 
 ## Ce qu'il faut retenir
 
-Dorénavant, toutes les animations qui vont suivre sont issus des tests dans les conditions réelles.
+Dorénavant, toutes les animations qui vont suivre sont issues des tests effectués dans des conditions réelles.
 
 Tous les rendus des animations sont regroupés <a href="\data\gif\18-05-2024\">ici</a>
 
@@ -235,7 +235,7 @@ L'utilisation de l'algorithme EMA a amélioré la fluidité des trajectoires. En
 
 Une caractéristique importante de l'algorithme est qu'il ne prédit pas lorsqu'il y a une coupure.
 
-Celà est du au fait que Localino ne renvoie pas de valeurs aberrantes lorsqu'il perd la connexion. Dans ce cas, l'algorithme ne s'excutera pas.
+Cela est dû au fait que Localino ne renvoie pas de valeurs aberrantes lorsqu'il perd la connexion. Dans ce cas, l'algorithme ne s'executera pas.
 
 Seulement lorsque la connexion est rétablie, l'algorithme reprendra là où il s'était arrêté et à l'aide du lissage EMA, il réalisera une "rétro-prédiction" pour éviter un gros saut.
 
